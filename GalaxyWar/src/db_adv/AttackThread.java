@@ -14,6 +14,8 @@ public class AttackThread extends Thread
 	private final static String CLOUD2 = "10.73.45.54";
 	private final static String MAC1 = "10.73.42.72";
 	private boolean running = true;
+	
+	public static int destroyed = -1;
 
 	public void finish()
 	{
@@ -41,42 +43,37 @@ public class AttackThread extends Thread
 				CallableStatement stmtGlobal = connGlobal.prepareCall( "{ CALL selectuser( ?, ? ) }" );
 				stmtGlobal.registerOutParameter( 1, Types.INTEGER );
 				stmtGlobal.registerOutParameter( 2, Types.INTEGER );
-				stmtGlobal.executeUpdate();
-				
-				ResultSet rs = stmtGlobal.getResultSet();
-				int ruid = rs.getInt( 0 );
-				int rdbid = rs.getInt( 1 );
-				stmtGlobal.close();
+				stmtGlobal.executeQuery();
 
-				CallableStatement stmtLocal = connLocal[rdbid].prepareCall( "{ CALL getpower( ?, ? ) }" );
+				int ruid = (int)stmtGlobal.getObject(1);
+				int rdbid = (int)stmtGlobal.getObject(2);
+				stmtGlobal.close();
+				System.out.println( "selectuser result : [" + ruid + ", " + rdbid + "]" );
+
+				CallableStatement stmtLocal = connLocal[rdbid].prepareCall( "{ CALL attack( ?, ?, ? ) }" );
 				stmtLocal.setInt( 1, ruid );
 				stmtLocal.registerOutParameter( 2, Types.INTEGER );
-				boolean hasResult = stmtLocal.execute();
+				stmtLocal.registerOutParameter( 3, Types.TINYINT );
+				stmtLocal.executeQuery();
 				
-				if ( ! hasResult )
-				{
-					System.out.println( "getpower Failed" );
-					continue;
-				}
-				
-				rs = stmtLocal.getResultSet();
+				int power = (int)stmtLocal.getObject(2);
+				int gid = (int) stmtLocal.getObject(3);
 				stmtLocal.close();
 				
-				int gid = (int) Math.floor( Math.random() * 4 );
 				Statement stmt = connLocal[ gid % 2 ].createStatement();
-				int row = stmt.executeUpdate( "UPDATE galaxy SET hp = hp - " + rs.getInt( 2 ) + " WHERE gid = " + gid );
+				int row = stmt.executeUpdate( "UPDATE galaxy SET hp = hp - " + power + " WHERE gid = " + gid );
 				stmt.close();
 
 				if ( row == 0 )
 					System.out.println( "Update Failed" );
 
 				stmt = connLocal[ gid % 2 ].createStatement();
-				rs = stmt.executeQuery( "SELECT COUNT(*) FROM galaxy WHERE hp <= 0 " );
+				ResultSet rs = stmt.executeQuery( "SELECT gid FROM galaxy WHERE hp <= 0 " );
 				
 				if ( rs.next() )
 				{
-					if ( rs.getInt( 1 ) > 0 )
-						running = false;
+					destroyed = rs.getInt( 1 );
+					running = false;
 				}
 				stmt.close();
 			}

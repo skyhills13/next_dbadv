@@ -14,18 +14,18 @@ public class GalaxyWar
 		for( int i = 0; i < 4; ++i )
 		{
 			attackThreads[i] = new AttackThread();
-//			attackThreads[i].start();
+			attackThreads[i].start();
 		}
 		
 		boolean running = true;
 		while ( running )
 		{
 			Thread.sleep( 100 );
-//			for( int i = 0; i < 4; ++i )
-//			{
-//				if ( attackThreads[i].isRunning() == false )
-//					running = false;
-//			}
+			for( int i = 0; i < 4; ++i )
+			{
+				if ( attackThreads[i].isRunning() == false )
+					running = false;
+			}
 		}
 		
 		registerThread.finish();
@@ -33,5 +33,7 @@ public class GalaxyWar
 		{
 			attackThreads[i].finish();
 		}
+		
+		System.out.println( "Game Finished : Galaxy #" + AttackThread.destroyed + " destroyed." );
 	}
 }

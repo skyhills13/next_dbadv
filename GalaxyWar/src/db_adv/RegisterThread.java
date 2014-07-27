@@ -36,34 +36,17 @@ public class RegisterThread extends Thread
 				stmtGlobal.registerOutParameter( 1, Types.INTEGER );
 				stmtGlobal.registerOutParameter( 2, Types.INTEGER );
 				stmtGlobal.registerOutParameter( 3, Types.TINYINT );
-				stmtGlobal.execute();
-				
-				ResultSet rs = stmtGlobal.getResultSet();
-				while ( rs == null )
-				{
-					stmtGlobal.getMoreResults();
-					System.out.println("Next");
-				}
+				stmtGlobal.executeQuery();
 
-				int ruid = rs.getInt( 0 );
-				int rdbid = rs.getInt( 1 );
-				int rgid = rs.getInt( 2 );
+				int ruid = (int)stmtGlobal.getObject(1);
+				int rdbid = (int)stmtGlobal.getObject(2);
+				int rgid = (int)stmtGlobal.getObject(3);
 				stmtGlobal.close();
 
-				System.out.println( "Adduser result : [" + ruid + ", " + rgid + ", " + rdbid + "]" );
-				
 				CallableStatement stmtLocal = connLocal[rdbid].prepareCall( "{ CALL adduser( ?, ? ) }" );
 				stmtLocal.setInt( 1, ruid );
 				stmtLocal.setInt( 2, rgid );
-				Boolean success = stmtLocal.execute();
-				
-				if ( ! success )
-				{
-					running = false;
-					throw new SQLException( "Register Failed" );
-				}
-
-				System.out.println( "Register step 2 Success" );
+				stmtLocal.executeQuery();
 			}
 		}
 		catch ( SQLException e )
