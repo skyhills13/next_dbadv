@@ -12,7 +12,7 @@ public class AttackThread extends Thread
 {
 	private final static String CLOUD1 = "10.73.45.50";
 	private final static String CLOUD2 = "10.73.45.54";
-	private final static String MAC1 = "10.73.42.72";
+	private final static String MAC1 = "10.73.43.123";
 	private boolean running = true;
 	
 	public static int destroyed = -1;
@@ -48,7 +48,7 @@ public class AttackThread extends Thread
 				int ruid = (int)stmtGlobal.getObject(1);
 				int rdbid = (int)stmtGlobal.getObject(2);
 				stmtGlobal.close();
-				System.out.println( "selectuser result : [" + ruid + ", " + rdbid + "]" );
+				System.out.println( "User #" + ruid + " attacks Galaxy #" + rdbid );
 
 				CallableStatement stmtLocal = connLocal[rdbid].prepareCall( "{ CALL attack( ?, ?, ? ) }" );
 				stmtLocal.setInt( 1, ruid );

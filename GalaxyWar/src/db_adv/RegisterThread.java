@@ -3,7 +3,6 @@ package db_adv;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -11,7 +10,7 @@ public class RegisterThread extends Thread
 {
 	private final static String CLOUD1 = "10.73.45.50";
 	private final static String CLOUD2 = "10.73.45.54";
-	private final static String MAC1 = "10.73.42.72";
+	private final static String MAC1 = "10.73.43.123";
 	private boolean running = true;
 
 	public void finish()
