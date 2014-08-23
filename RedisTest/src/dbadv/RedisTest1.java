@@ -11,7 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RedisTest
+public class RedisTest1
 {
 	private final static String SERVER_ADDRESS = "10.73.45.56";
 
